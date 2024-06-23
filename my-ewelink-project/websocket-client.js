@@ -1,7 +1,3 @@
-// websocket-client.js
-
-const WebSocket = require('ws');
-
 const wsUrl = 'wss://us-pconnect7.coolkit.cc:443/api/ws';
 
 const authData = {
@@ -38,15 +34,15 @@ const controlDataOff = {
 
 const ws = new WebSocket(wsUrl);
 
-ws.on('open', () => {
+ws.onopen = () => {
     console.log(`Conectado a WebSocket en ${wsUrl}`);
     ws.send(JSON.stringify(authData));
     console.log(`Mensaje de autenticación enviado: ${JSON.stringify(authData)}`);
-});
+};
 
-ws.on('message', (data) => {
-    console.log(`Mensaje recibido: ${data}`);
-    const message = JSON.parse(data);
+ws.onmessage = (event) => {
+    console.log(`Mensaje recibido: ${event.data}`);
+    const message = JSON.parse(event.data);
     if (message.error === 0 && message.config && message.config.hbInterval) {
         setTimeout(() => {
             const controlDataOnWithSequence = { ...controlDataOn, sequence: Date.now().toString() };
@@ -75,12 +71,12 @@ ws.on('message', (data) => {
             console.log(`Error al ejecutar el comando: ${message.error}`);
         }
     }
-});
+};
 
-ws.on('close', () => {
+ws.onclose = () => {
     console.log('Conexión WebSocket cerrada');
-});
+};
 
-ws.on('error', (error) => {
+ws.onerror = (error) => {
     console.log(`Error en WebSocket: ${error.message}`);
-});
+};
